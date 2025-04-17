@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MR TACS UPI Payment</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f2f2f2;
+      max-width: 600px;
+      margin: auto;
+    }
+    h2 {
+      color: #333;
+    }
+    input, textarea, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #19d216ed;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .qr {
+      text-align: center;
+      margin: 20px 0;
+    }
+    .amount-box {
+      font-size: 18px;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h2>Pay MR TACS</h2>
+
+  <label for="coupon">Have a Coupon Code?</label>
+  <input type="text" id="coupon" placeholder="Enter Coupon Code"/>
+  <button onclick="applyCoupon()">Apply Coupon</button>
+
+  <div class="amount-box">
+    Amount to Pay: ₹<span id="amount">200</span>
+  </div>
+
+  <div class="qr">
+    <p>Scan & Pay:</p>
+    <img src="https://api.qrserver.com/v1/create-qr-code/?data=upi://pay?pa=vinay6232q@ybl&pn=MR%20TACS&am=200&cu=INR" id="qrCode" alt="QR Code" width="200">
+  </div>
+
+  <p>Or click below to pay via UPI apps:</p>
+  <a id="upiLink" href="upi://pay?pa=vinay6232q@ybl&pn=MR%20TACS&am=200&cu=INR">
+    <button>Pay via UPI App</button>
+  </a>
+
+  <form id="paymentForm" action="https://formsubmit.co/nnbgaming652@gmail.com" method="POST">
+    <label>Your Name</label>
+    <input type="text" name="name" id="userName" required />
+
+    <label>Your Email</label>
+    <input type="email" name="email" required />
+
+    <label>Transaction ID</label>
+    <input type="text" name="txn" id="txnId" required />
+
+    <label>Message (optional)</label>
+    <textarea name="msg" placeholder="Write anything..."></textarea>
+
+    <!-- Hidden fields for autoresponse -->
+    <input type="hidden" name="_subject" value="Payment Successful - MR TACS">
+    <input type="hidden" name="_template" value="box">
+    <input type="hidden" name="_autoresponse" id="autoMsg" value="">
+
+    <button type="submit" id="submitBtn" disabled>Submit Payment Details</button>
+  </form>
+
+  <script>
+    let amount = 200;
+    let transactionIdSet = new Set(); // To track used txn IDs
+
+    function applyCoupon() {
+      const code = document.getElementById('coupon').value.trim();
+      if (code.toUpperCase() === "MR TACS") {
+        amount = 150;
+        document.getElementById('amount').innerText = amount;
+        alert("Coupon applied! ₹50 discount added.");
+      } else {
+        amount = 200;
+        document.getElementById('amount').innerText = amount;
+        alert("Invalid coupon code");
+      }
+      updateUPI();
+    }
+
+    function updateUPI() {
+      const upiUrl = `upi://pay?pa=vinay6232q@ybl&pn=MR%20TACS&am=${amount}&cu=INR`;
+      document.getElementById('upiLink').href = upiUrl;
+      document.getElementById('qrCode').src = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(upiUrl)}`;
+    }
+
+    const form = document.getElementById("paymentForm");
+    form.addEventListener("submit", function (e) {
+      const txnId = document.getElementById("txnId").value.trim();
+      
+      if (transactionIdSet.has(txnId)) {
+        e.preventDefault();
+        alert("This transaction ID has already been used.");
+        return;
+      }
+
+      transactionIdSet.add(txnId);
+
+      const name = document.getElementById("userName").value;
+      const msg = `Thank you for buying our video editing bundle. Here’s your bundle pack drive link: \nhttps://drive.google.com/drive/folders/1DHjghqfhwklWpl1VlBMygt9eeD1s_LLE?usp=drive_link`;
+      document.getElementById("autoMsg").value = msg;
+    });
+
+    document.getElementById("txnId").addEventListener("input", function() {
+      const txnId = document.getElementById("txnId").value;
+      document.getElementById("submitBtn").disabled = txnId.trim().length === 0;
+    });
+  </script>
+</body>
+</html>
